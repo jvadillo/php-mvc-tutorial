@@ -1,8 +1,11 @@
 # 🛠️ Guía Práctica: Construye tu propio MVC en PHP (paso a paso con comentarios)
 
-Esta guía enseña a crear una arquitectura **MVC (Modelo - Vista - Controlador)** con PHP puro, de forma **incremental**. Está pensada para principiantes y contiene explicaciones y comentarios en el código.
+Esta guía enseña a crear una arquitectura **MVC (Modelo - Vista - Controlador)** con PHP puro, de forma **incremental**. Está pensada para principiantes y contiene explicaciones y comentarios en el código. El objetivo aquí es no usar ningún framework (como Laravel o Symfony), sino crear un pequeño esqueleto MVC desde cero, para explicar qué hace cada parte y cómo se comunican entre sí.
 
-Comenzaremos con una salida simple desde un modelo hasta llegar a un CRUD completo usando base de datos.
+Comenzaremos con una salida simple desde un modelo hasta llegar a un CRUD completo usando base de datos. El objetivo es aprender a:
+- Separar la lógica de negocio (Modelo), la interfaz (Vista) y el control de flujo (Controlador).
+- Usar rutas simples con $_GET['action'].
+- Conectar todo de manera sencilla, sin automatismos ni frameworks.
 
 ---
 
@@ -17,7 +20,7 @@ El patrón **MVC** separa una aplicación en tres componentes:
 ### Ejemplo de flujo:
 
 ```
-Usuario -> Navegador -> index.php?action=form
+Usuario -> Introduce en el Navegador -> index.php?action=form
        -> Controlador (UserController)
        -> Modelo (User)
        -> Vista (HTML) con resultado
