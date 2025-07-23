@@ -30,6 +30,7 @@ Este enfoque ayuda a mantener el código ordenado, reutilizable y más fácil de
 
 ---
 
+
 ## 📃 Paso 1: Primer contacto con MVC (sin formularios ni BBDD)
 
 ### ✅ Objetivo:
@@ -138,7 +139,8 @@ class User {
 
 ```php
 public function form() {
-    require 'views/user_form.php'; // Muestra el formulario
+    // Mostramos el formulario al usuario
+    require 'views/user_form.php';
 }
 
 public function saveUser() {
@@ -146,9 +148,11 @@ public function saveUser() {
     $name = $_POST['name'] ?? '';
     $age = $_POST['age'] ?? 0;
 
+    // Creamos un nuevo objeto Usuario con esos datos
     $user = new User($name, $age);
-    $user->save(); // Simulado
+    $user->save(); // Simulado (todavía sin BBDD)
 
+    // Mostramos la vista con el resultado
     require 'views/user_result.php';
 }
 ```
@@ -185,4 +189,102 @@ public function saveUser() {
 ```
 
 ---
+
+## 🧩 Paso 3: Conectar a una base de datos y listar todos los usuarios
+
+### ✅ Objetivo:
+
+Guardar usuarios en una base de datos real y mostrarlos en una tabla en HTML.
+
+### 🗃️ Requisitos previos:
+
+- Tener un servidor con MySQL (puede ser XAMPP, Laragon, etc.).
+- Crear una base de datos y una tabla:
+
+```sql
+CREATE DATABASE mini_mvc;
+
+USE mini_mvc;
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  age INT NOT NULL
+);
+```
+
+### 🔌 Conexión: crear `models/Database.php`
+
+```php
+<?php
+class Database {
+    public static function connect() {
+        return new PDO("mysql:host=localhost;dbname=mini_mvc;charset=utf8", "root", "");
+    }
+}
+```
+
+### 🛠️ models/User.php (usar la conexión y recuperar todos los usuarios)
+
+```php
+require_once 'models/Database.php';
+
+class User {
+    public $id;
+    public $name;
+    public $age;
+
+    public function __construct($name = '', $age = 0) {
+        $this->name = $name;
+        $this->age = $age;
+    }
+
+    public function save() {
+        $pdo = Database::connect();
+        $stmt = $pdo->prepare("INSERT INTO users (name, age) VALUES (?, ?)");
+        return $stmt->execute([$this->name, $this->age]);
+    }
+
+    public static function getAll() {
+        $pdo = Database::connect();
+        $stmt = $pdo->query("SELECT * FROM users");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+```
+
+### 👨‍💼 controllers/UserController.php (añadir método `list`)
+
+```php
+public function list() {
+    // Obtener todos los usuarios del modelo
+    $users = User::getAll();
+
+    // Mostrar vista con listado
+    require 'views/user_list.php';
+}
+```
+
+### 📃 views/user\_list.php
+
+```php
+<!DOCTYPE html>
+<html>
+<head><title>Lista de usuarios</title></head>
+<body>
+<h1>Usuarios registrados</h1>
+<a href="index.php?action=form">Crear nuevo usuario</a>
+<table border="1">
+    <tr><th>ID</th><th>Nombre</th><th>Edad</th></tr>
+    <?php foreach ($users as $user): ?>
+    <tr>
+        <td><?= $user['id'] ?></td>
+        <td><?= htmlspecialchars($user['name']) ?></td>
+        <td><?= htmlspecialchars($user['age']) ?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+</body>
+</html>
+```
 
